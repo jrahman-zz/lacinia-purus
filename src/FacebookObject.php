@@ -1,8 +1,8 @@
 <?php
-require_once "CRU_Defines.php";
-require_once "CRU_Facebook_Client.php";
-require_once "CRU_Facebook_Fields.php";
-require_once "CRU_Facebook_Connections.php";
+require_once "Defines.php";
+require_once "FacebookClient.php";
+require_once "FacebookFields.php";
+require_once "FacebookConnections.php";
 
 
 /**
@@ -11,7 +11,7 @@ require_once "CRU_Facebook_Connections.php";
  * @author Jason P Rahman (jprahman93@gmail.com, rahmanj@purdue.edu)
  *
  */
-class CRU_Facebook_Object {
+class FacebookObject {
 
 
     /**
@@ -30,7 +30,7 @@ class CRU_Facebook_Object {
                 $fields = $objectId;
                 $this->_objectId = $objectId['id'];
             } else {
-                throw new CRU_Facebook_NoSuchFieldException();
+                throw new FacebookNoSuchFieldException();
             }
         } else {
             $fields = $client->getObject($objectId, $fields);
@@ -38,8 +38,8 @@ class CRU_Facebook_Object {
         }
 
         
-        $this->_fields = new CRU_Facebook_Fields($fields, $client);
-        $this->_connections = new CRU_Facebook_Connections($objectId, $client);
+        $this->_fields = new FacebookFields($fields, $client);
+        $this->_connections = new FacebookConnections($objectId, $client);
 
         $this->_facebookClient = $client;       
     }
@@ -49,7 +49,7 @@ class CRU_Facebook_Object {
      * Get a property with the specified name
      *
      * @param string 
-     * @return object a CRU_Facebook_Fields or CRU_Facebook_Connections object
+     * @return object a FacebookFields or FacebookConnections object
      * @throws Exception
      */
     public function __get($name) {
@@ -73,7 +73,6 @@ class CRU_Facebook_Object {
         } catch (Exception $e) {
             return FALSE;
         }
-
     }
 
 
@@ -123,7 +122,7 @@ class CRU_Facebook_Object {
  * @author Jason P Rahman (jprahman93@gmail.com, rahmanj@purdue.edu)
  *
  */
-class CRU_Facebook_NoSuchFieldException extends Exception {
+class FacebookNoSuchFieldException extends Exception {
     
     public function __construct($name) {
         parent::__construct("No field named " . $name . " found");

@@ -1,7 +1,7 @@
 <?php
 
-require_once "CRU_Defines.php";
-require_once "CRU_Facebook_Client.php";
+require_once "Defines.php";
+require_once "FacebookClient.php";
 
 /**
  * Represents the fields of a Facebook graph object
@@ -9,7 +9,7 @@ require_once "CRU_Facebook_Client.php";
  * @author Jason P Rahman (jprahman93@gmail.com, rahmanj@purdue.edu)
  *
  */
-class CRU_Facebook_Fields implements Iterator {
+class FacebookFields implements Iterator {
 
     /**
      * Construct an instance of a set of fields
@@ -81,8 +81,8 @@ class CRU_Facebook_Fields implements Iterator {
      * representing the fields of the facebook graph object
      *
      * @param string $name the name of the field to fetch
-     * @return mixed Returns either an array of CRU_Facebook_Objects or a string field value
-     * @throw CRU_Facebook_NoSuchFieldException
+     * @return mixed Returns either an array of FacebookObjects or a string field value
+     * @throw FacebookNoSuchFieldException
      */
     public function __get($name) {
         if (isset($this->_expandedObjectFields[$name])) {
@@ -114,7 +114,7 @@ class CRU_Facebook_Fields implements Iterator {
             $this->_hasBeenExpanded = TRUE;
             return $this->__get($name);
         } else {
-            throw new CRU_Facebook_NoSuchFieldException($name);
+            throw new FacebookNoSuchFieldException($name);
         }
     }
 
@@ -140,7 +140,7 @@ class CRU_Facebook_Fields implements Iterator {
      *
      * @param array $fieldArray an array of associative arrays holding partial
      *                          object information for each object in the field
-     * @return array an array containing CRU_Facebook_Objects for each 
+     * @return array an array containing FacebookObjects for each 
      *               object in the field
      */
     private function _expandField($fieldArray) {
@@ -149,16 +149,16 @@ class CRU_Facebook_Fields implements Iterator {
             $result = array();
             foreach ($fieldArray as $field) {
                 if (isset($field['id'])) {
-                    array_push($result, new CRU_Facebook_Object($field, $this->_facebookClient));
+                    array_push($result, new FacebookObject($field, $this->_facebookClient));
                 } else {
-                    array_push($result, new CRU_Facebook_Struct($field, $this->_facebookClient));
+                    array_push($result, new FacebookStruct($field, $this->_facebookClient));
                 }
             }
         } else {
             if (isset($fieldArray['id'])) {
-                $result = new CRU_Facebook_Object($fieldArray, $this->_facebookClient);
+                $result = new FacebookObject($fieldArray, $this->_facebookClient);
             } else {
-                $result = new CRU_Facebook_Struct($fieldArray, $this->_facebookClient);
+                $result = new FacebookStruct($fieldArray, $this->_facebookClient);
             }
         }
         return $result;

@@ -1,17 +1,17 @@
 <?php
 
-require_once "CRU_Facebook_Client.php";
-require_once "CRU_Facebook_Object.php";
-require_once "CRU_Facebook_Struct.php";
+require_once "FacebookClient.php";
+require_once "FacebookObject.php";
+require_once "FacebookStruct.php";
 
 
 /**
-* Represents a connection from a CRU_Facebook_Object
+* Represents a connection from a FacebookObject
 *
 * @author Jason P Rahman (jprahman93@gmail.com, rahmanj@purdue.edu)
 *
 */
-class CRU_Facebook_Connection implements Iterator, ArrayAccess {
+class FacebookConnection implements Iterator, ArrayAccess {
 
     /**
      * Construct an instance of a Facebook connection
@@ -41,7 +41,7 @@ class CRU_Facebook_Connection implements Iterator, ArrayAccess {
      * @return boolean true if the offset exists, false otherwise
      */
     public function offsetExists($offset) {
-        return isset($this->objects);
+        return isset($this->objects[$offset]);
     }
        
 
@@ -138,7 +138,7 @@ class CRU_Facebook_Connection implements Iterator, ArrayAccess {
      *
      * @param string $connectionName the name of the connection to load
      * @return mixed FALSE if the connection couldn't be found,
-     *                     an array of CRU_Facebook_Objects otherwise
+     *                     an array of FacebookObjects otherwise
      */
     private function _loadConnection($connectionName) {
         // Attempt to fetch the graph connection with the given name
@@ -179,16 +179,16 @@ class CRU_Facebook_Connection implements Iterator, ArrayAccess {
             $result = array();
             foreach ($connectionArray as $connection) {
                 if (isset($connection['id'])) {
-                    array_push($result, new CRU_Facebook_Object($connection, $this->_facebookClient));
+                    array_push($result, new FacebookObject($connection, $this->_facebookClient));
                 } else {
-                    array_push($result, new CRU_Facebook_Struct($connection, $this->_facebookClient));
+                    array_push($result, new FacebookStruct($connection, $this->_facebookClient));
                 }
             }
         } else {
             if (isset($connectionArray['id'])) {
-                $result = new CRU_Facebook_Object($connectionArray, $this->_facebookClient);
+                $result = new FacebookObject($connectionArray, $this->_facebookClient);
             } else {
-                $result = new CRU_Facebook_Struct($connectionArray, $this->_facebookClient);
+                $result = new FacebookStruct($connectionArray, $this->_facebookClient);
             }
         }
         return $result;
@@ -196,7 +196,7 @@ class CRU_Facebook_Connection implements Iterator, ArrayAccess {
 
 
     /**
-     * The CRU_Facebook_Objects in the connection
+     * The FacebookObjects in the connection
      *
      * @var object
      */

@@ -1,16 +1,15 @@
 <?php
 
-require_once "CRU_Defines.php";
-require_once "CRU_Facebook_Client.php";
-require_once "CRU_Facebook_Connection.php";
+require_once "Defines.php";
+require_once "FacebookClient.php";
+require_once "FacebookConnection.php";
 
 /**
  * Represents a connection from a Facebook graph object
  *
  * @author Jason P Rahman (jprahman93@gmail.com, rahmanj@purdue.edu)
- *
  */
-class CRU_Facebook_Connections {
+class FacebookConnections {
 
     /**
      * Construct a set of connections from the given object
@@ -84,7 +83,7 @@ class CRU_Facebook_Connections {
      * Loads the connection with the given name
      *
      * @param string $name the name of the connection to retrieve
-     * @return mixed a CRU_Facebook_Connection object if it exists, FALSE otherwise
+     * @return mixed a FacebookConnection object if it exists, FALSE otherwise
      */
     private function _loadConnection($name) {
         try {

@@ -5,12 +5,10 @@ require_once "CRU_Facebook_Object.php";
 
 /**
  * Class to hold non-object structures for the Facebook Graph API
- *
  * 
  * @author Jason P Rahman (rahmanj@purdue.edu, jprahman93@gmail.com)
- *
  */
-class CRU_Facebook_Struct {
+class FacebookStruct {
 
     
     public function __construct($fields, $client) {
@@ -70,7 +68,7 @@ class CRU_Facebook_Struct {
      *
      * @param array $fieldArray an array of associative arrays holding partial
      *                          object information for each object in the field
-     * @return array an array containing CRU_Facebook_Objects for each 
+     * @return array an array containing FacebookObjects for each 
      *               object in the field
      */
     private function _expandField($fieldArray) {
@@ -79,16 +77,16 @@ class CRU_Facebook_Struct {
             $result = array();
             foreach ($fieldArray as $field) {
                 if (isset($field['id'])) {
-                    array_push($result, new CRU_Facebook_Object($field, $this->_facebookClient));
+                    array_push($result, new FacebookObject($field, $this->_facebookClient));
                 } else {
-                    array_push($result, new CRU_Facebook_Struct($field, $this->_facebookClient));
+                    array_push($result, new FacebookStruct($field, $this->_facebookClient));
                 }
             }
         } else {
             if (isset($fieldArray['id'])) {
-                $result = new CRU_Facebook_Object($fieldArray, $this->_facebookClient);
+                $result = new FacebookObject($fieldArray, $this->_facebookClient);
             } else {
-                $result = new CRU_Facebook_Struct($fieldArray, $this->_facebookClient);
+                $result = new FacebookStruct($fieldArray, $this->_facebookClient);
             }
         }
         return $result;
