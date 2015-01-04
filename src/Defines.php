@@ -17,7 +17,7 @@ class Defines {
      * @var string
      * @access public
      */
-    const facebookApiDir = "facebook_api/";
+    const facebookApiDir = "../lib/facebook-php-sdk-v4-4.0-dev/";
 
     /**
      * The (relative) path to the config file
