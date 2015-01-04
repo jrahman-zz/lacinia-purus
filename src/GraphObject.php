@@ -9,7 +9,6 @@ require_once "GraphConnections.php";
  * Class to represent an object in the Facebook object graph
  *
  * @author Jason P Rahman (jprahman93@gmail.com, rahmanj@purdue.edu)
- *
  */
 class GraphObject {
 
@@ -23,19 +22,10 @@ class GraphObject {
      *                       be used to create the object
      * @throws
      */
-    public function __construct($objectId, $client, $fields = array()) {
+    public function __construct($objectId, $client) {
         // Fetch the results from Facebook and save everything we need
-        if (is_array($objectId)) {
-            if (isset($objectId['id'])) {
-                $fields = $objectId;
-                $this->_objectId = $objectId['id'];
-            } else {
-                throw new GraphNoSuchFieldException();
-            }
-        } else {
-            $fields = $client->getObject($objectId, $fields);
-            $this->_objectId = $objectId;
-        }
+        $fields = $client->getObject($objectId);
+        $this->_objectId = $objectId;
 
         
         $this->_fields = new GraphFields($fields, $client);

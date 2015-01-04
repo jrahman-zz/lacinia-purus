@@ -47,10 +47,12 @@ class GraphConnections {
             }
         } else {
             // Attempt to load the connection since we haven't already tried
-            $this->_graphConnections[$name] = $this->_loadConnection($name);
-            if ($this->_graphConnections[$name] !== FALSE) {
-                return $this->_graphConnections[$name];
+            $connection = $this->_loadConnection($name);
+            if ($connection !== FALSE) {
+                $this->_graphConnections[$name] = $connection;
+                return $connection;
             } else {
+                $this->_graphConnections[$name] = FALSE;
                 throw new GraphNoSuchFieldException($name);  
             }
         }

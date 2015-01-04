@@ -17,11 +17,14 @@ class GraphFields implements Iterator {
      * @param array $fields an array of associative arrays holding the partial subobject information
      * @param object $facebookClient the Graph client associated with these fields
      */
-    public function __construct($fields, $facebookClient) {
-        // TODO Add validation
+    public function __construct($object, $facebookClient) {
         $this->_hasBeenExpanded = FALSE;
-        $this->_objectFields = $fields;
-        $this->_expandedObjectFields = array();
+        $this->_object = $object;
+        $this->_propertyNames = array();
+        for ($object->getPropertyNames as $name) {
+            $this->_propertyNames[$name] = 1;
+        }
+        $this->_keys = array_keys($this->_propertyNames);
         $this->_facebookClient = $facebookClient;
     }
 
@@ -31,7 +34,6 @@ class GraphFields implements Iterator {
      */
     public function rewind() {
         $this->_currentPosition = 0;
-        $this->_keys = array_merge(array_keys($this->_expandedObjectFields), array_keys($this->_objectFields));
     }
 
     /**
@@ -85,34 +87,9 @@ class GraphFields implements Iterator {
      * @throw GraphNoSuchFieldException
      */
     public function __get($name) {
-        if (isset($this->_expandedObjectFields[$name])) {
-
-            // Return the already expanded object field
-            return $this->_expandedObjectFields[$name];
-        }
-
-        if (isset($this->_objectFields[$name])) {
-
-            // If this is an array, we need to expand it
-            if (is_array($this->_objectFields[$name])) {
-                // Expand the unexpanded version of the field
-                $this->_expandedObjectFields[$name] = $this->_expandField($this->_objectFields[$name]);
-                // Unset the unexpanded version
-                unset($this->_objectFields[$name]);
-                return $this->_expandedObjectFields[$name];
-            } else {
-                // Return the field itself if it is not an array
-                return $this->_objectFields[$name];
-            }
-        }
-        
-        // We couldn't find the field either because we haven't expanded the object fully, or it doesn't exist
-        if ($this->_hasBeenExpanded == FALSE) {
-            // Attempt to expand the object whose fields we hold
-            $newFields = $this->_facebookClient->getObject($this->_objectFields['id']);
-            $this->_objectFields = $newFields;
-            $this->_hasBeenExpanded = TRUE;
-            return $this->__get($name);
+        if () {
+            // TODO, wrap GraphObject return values
+            return $this->_object->getProperty($name);
         } else {
             throw new GraphNoSuchFieldException($name);
         }
@@ -126,62 +103,20 @@ class GraphFields implements Iterator {
      * @return bool TRUE if the field does exist, FALSE otherwise
      */
     public function __isset($name) {
-        try {
-            $this->__get($name);
+        if (array_key_exists($name, $this->_propertyNames)
+            && $this->_propertyNames[$name] > 0) {
             return TRUE;
-        } catch (Exception $e) {
+        } else {
             return FALSE;
         }
     }
 
-
     /**
-     * Take a array of associative arrays representing a field and expand them into objects
+     * Holds the underlying GraphObject
      *
-     * @param array $fieldArray an array of associative arrays holding partial
-     *                          object information for each object in the field
-     * @return array an array containing GraphObjects for each 
-     *               object in the field
+     * @var object
      */
-    private function _expandField($fieldArray) {
-        
-        if (is_array($fieldArray) && isset($fieldArray[0]) && is_array($fieldArray[0])) {
-            $result = array();
-            foreach ($fieldArray as $field) {
-                if (isset($field['id'])) {
-                    array_push($result, new GraphObject($field, $this->_facebookClient));
-                } else {
-                    array_push($result, new GraphStruct($field, $this->_facebookClient));
-                }
-            }
-        } else {
-            if (isset($fieldArray['id'])) {
-                $result = new GraphObject($fieldArray, $this->_facebookClient);
-            } else {
-                $result = new GraphStruct($fieldArray, $this->_facebookClient);
-            }
-        }
-        return $result;
-    }
-
-
-    /**
-     * Holds the fields of the object
-     *
-     * @var array
-     */
-    private $_objectFields;
-
-
-    /**
-     * Holds the expanded versions of the fields in the
-     * event that a field is itself is an (array of) object(s) 
-     * that need to replaced with actual objects
-     *
-     * @var array
-     */
-    private $_expandedObjectFields;
-
+    private $_object;
 
     /**
      * Client used to retrieve this object and other objects
@@ -190,7 +125,6 @@ class GraphFields implements Iterator {
      * @var object
      */
     private $_facebookClient;
-
 
     /**
      * The current index of the iterator

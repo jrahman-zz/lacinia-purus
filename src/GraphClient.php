@@ -1,8 +1,11 @@
 <?php
 
 require_once "Defines.php";
-require_once Defines::facebookApiDir . "facebook.php";
 
+define('FACEBOOK_SDK_V4_SRC_DIR', Defines::facebookApiDir . "/src/Facebook/");
+require_once __DIR__ . "/" . Defines::facebookApiDir . "/autoload.php";
+
+use Facebook\FacebookSession;
 
 /**
  *
@@ -21,12 +24,13 @@ class GraphClient {
      * @param string $appSecret the Facebook application secret 
      */
     public function __construct($appId, $appSecret) {
-        $facebookConfig = array();
-        $facebookConfig['appId'] = $appId;
-        $facebookConfig['secret'] = $appSecret;
+
+        // Setup the Facebook API to use our app credentials
+        Facebook::setDefaultApplication($appId, $appSecret);
 
         try {
-            $this->_facebookClient = new Facebook($facebookConfig);
+            $this->_session = FacebookSession::newAppSession();
+            $this->_session->validate();
         } catch (Exception $e) {
             throw new GraphInitializationException($e->getMessage());
         }
@@ -67,10 +71,7 @@ class GraphClient {
      */
     public function getConnection($objectId, $connectionName, $limit = "") {
         try {
-			if ($limit != "") {
-				$limit = "?limit=$limit";
-			}
-            $array = $this->_makeGetRequest($objectId . "/" . $connectionName . $limit);
+            $array = $this->_makeGetRequest($objectId . "/" . $connectionName);
             if (isset($array['data'])) {
                 $array = $array['data'];
             }
@@ -91,7 +92,8 @@ class GraphClient {
      * @throws 
      */
     private function _makeGetRequest($queryString) {
-        return $this->_facebookClient->api($queryString, 'GET');
+        $request = new FacebookRequest($this->_session, 'GET', $queryString);
+        return $request->execute()->getGraphObject();
     }
 
 
@@ -105,6 +107,8 @@ class GraphClient {
      */
     private function _makePostRequest($id, $postContent) {
         // TODO Finish this
+        $queryString = $id . "/"; // TODO, finish this
+        $request = new FacebookRequest($this->_session, 'POST', $queryString);
         $this->_facebookClient->api($queryString, 'POST');
     }
 
@@ -146,11 +150,11 @@ class GraphClient {
 
 
     /**
-     * The Graph API client we are using    
+     * The Graph API session in use    
      *
      * @var object
      */
-    private $_facebookClient;    
+    private $_session;    
 }
 
 
