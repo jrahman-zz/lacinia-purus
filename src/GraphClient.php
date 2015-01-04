@@ -65,22 +65,19 @@ class GraphClient {
      * Fetch the list of objects in the given connection
      *
      * @param string $objectId the ID of the object at the source of the connection
-     * @param string $connectionName the name of the kind of connection to get
+     * @param string $edgeName the name of the kind of edge to get
      * @return array an array of associative arrays containing the partial fields of
      *               the objects in the connection
      */
-    public function getConnection($objectId, $connectionName, $limit = "") {
+    public function getEdge($objectId, $edgeName, $limit = "") {
         try {
-            $array = $this->_makeGetRequest($objectId . "/" . $connectionName);
-            if (isset($array['data'])) {
-                $array = $array['data'];
-            }
+            $response = $this->_makeGetRequest($objectId . "/" . $edgeName);
         } catch (GraphApiException $e) {
             $this->_throwException($e);
         } catch (Exception $e) {
             throw $e;
         }
-        return $array;
+        return $response;
     }
 
        
@@ -93,7 +90,7 @@ class GraphClient {
      */
     private function _makeGetRequest($queryString) {
         $request = new FacebookRequest($this->_session, 'GET', $queryString);
-        return $request->execute()->getGraphObject();
+        return $request->execute();
     }
 
 
@@ -201,7 +198,7 @@ class GraphNoSuchObjectException extends Exception {
  * @author Jason P Rahman (jprahman93@gmail.com, rahmanj@purdue.edu)
  * 
  */
-class GraphNoSuchConnectionException extends Exception {
+class GraphNoSuchEdgeException extends Exception {
 
 
     /**

@@ -6,27 +6,27 @@ require_once "GraphStruct.php";
 
 
 /**
-* Represents a connection from a GraphObject
+* Represents an edge from a GraphObject
 *
 * @author Jason P Rahman (jprahman93@gmail.com, rahmanj@purdue.edu)
 *
 */
-class GraphConnection implements Iterator, ArrayAccess {
+class GraphEdge implements Iterator, ArrayAccess {
 
     /**
-     * Construct an instance of a Graph connection
+     * Construct an instance of a Graph Edge
      *
-     * @param string $objectId the ID of the object this connection leads from
-     * @param string $name the name of this particular connection
+     * @param string $objectId the ID of the object this edge leads from
+     * @param string $name the name of this particular edge
      * @param string $facebookClient 
      */
     public function __construct($objectId, $name, $facebookClient) {
 
         $this->_objectId = $objectId;
-        $this->_connectionName = $name;
+        $this->_edgeName = $name;
         $this->_facebookClient = $facebookClient;
 
-        $this->_objects = $this->_loadConnection($this->_connectionName);
+        $this->_objects = $this->_loadEdge($this->_edgeName);
 
         if (!is_array($this->_objects)) {
             $this->_objects = array($this->_objects);
@@ -134,61 +134,61 @@ class GraphConnection implements Iterator, ArrayAccess {
 
 
     /**
-     * Load the objects for the connection with the given name
+     * Load the objects for the edge with the given name
      *
-     * @param string $connectionName the name of the connection to load
-     * @return mixed FALSE if the connection couldn't be found,
+     * @param string $edgeName the name of the edge to load
+     * @return mixed FALSE if the edge couldn't be found,
      *                     an array of GraphObjects otherwise
      */
-    private function _loadConnection($connectionName) {
-        // Attempt to fetch the graph connection with the given name
+    private function _loadEdge($edgeName) {
+        // Attempt to fetch the graph edge with the given name
         try {
-            $connection = $this->_getConnection($connectionName);
+            $edge = $this->_getEdge($edgeName);
         } catch (Exception $e) {
             return FALSE;
         }
                 
-        // Now that we have our connection array, expand it
-        return $this->_expandConnection($connection);
+        // Now that we have our edge array, expand it
+        return $this->_expandEdge($edge);
     }
 
     
     /**
-     * Get the connection array for the current object with the given connection name
+     * Get the edge array for the current object with the given edge name
      *
-     * @param string $connectionName the name of the graph connection to fetch
+     * @param string $edgeName the name of the graph edge to fetch
      * @return array an array of associative arrays representing
-     *               the fields of each object in the connection
+     *               the fields of each object in the edge
      */
-    private function _getConnection($connectionName) {
-        $result = $this->_facebookClient->getConnection($this->_objectId, $connectionName, "5");
+    private function _getEdge($edgeName) {
+        $result = $this->_facebookClient->getEdge($this->_objectId, $edgeName, "5");
         return $result;
     }   
 
 
     /**
-     * Expand the array representing the connection into an array
-     * of objects representing the objects in the connection
+     * Expand the array representing the edge into an array
+     * of objects representing the objects in the edge
      *
-     * @param array $connectionArray an array of associative arrays holding partial information
-     *                               for each object that is part of the connection
-     * @return array an array of GraphObjects representing the connection
+     * @param array $nodeArray an array of associative arrays holding partial information
+     *                               for each object connected via edge
+     * @return array an array of GraphObjects representing the endpoint of the edges
      */
-    private function _expandConnection($connectionArray) {
-        if (is_array($connectionArray) && isset($connectionArray[0]) && is_array($connectionArray[0])) {
+    private function _expandEdge($vertexArray) {
+        if (is_array($vertexArray) && isset($vertexArray[0]) && is_array($vertexArray[0])) {
             $result = array();
-            foreach ($connectionArray as $connection) {
-                if (isset($connection['id'])) {
-                    array_push($result, new GraphObject($connection, $this->_facebookClient));
+            foreach ($vertexArray as $vertex) {
+                if (isset($vertex['id'])) {
+                    array_push($result, new GraphObject($vertex, $this->_facebookClient));
                 } else {
-                    array_push($result, new GraphStruct($connection, $this->_facebookClient));
+                    array_push($result, new GraphStruct($vertex, $this->_facebookClient));
                 }
             }
         } else {
-            if (isset($connectionArray['id'])) {
-                $result = new GraphObject($connectionArray, $this->_facebookClient);
+            if (isset($vertexArray['id'])) {
+                $result = new GraphObject($vertexArray, $this->_facebookClient);
             } else {
-                $result = new GraphStruct($connectionArray, $this->_facebookClient);
+                $result = new GraphStruct($vertexArray, $this->_facebookClient);
             }
         }
         return $result;
@@ -214,7 +214,7 @@ class GraphConnection implements Iterator, ArrayAccess {
      *
      * @var string
      */ 
-    private $_connectionName;
+    private $_edgeName;
 
 
     /**
