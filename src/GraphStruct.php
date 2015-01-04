@@ -1,6 +1,6 @@
 <?php
 
-require_once "CRU_Facebook_Object.php";
+require_once "GraphObject.php";
 
 
 /**
@@ -8,7 +8,7 @@ require_once "CRU_Facebook_Object.php";
  * 
  * @author Jason P Rahman (rahmanj@purdue.edu, jprahman93@gmail.com)
  */
-class FacebookStruct {
+class GraphStruct {
 
     
     public function __construct($fields, $client) {
@@ -68,7 +68,7 @@ class FacebookStruct {
      *
      * @param array $fieldArray an array of associative arrays holding partial
      *                          object information for each object in the field
-     * @return array an array containing FacebookObjects for each 
+     * @return array an array containing GraphObjects for each 
      *               object in the field
      */
     private function _expandField($fieldArray) {
@@ -77,16 +77,16 @@ class FacebookStruct {
             $result = array();
             foreach ($fieldArray as $field) {
                 if (isset($field['id'])) {
-                    array_push($result, new FacebookObject($field, $this->_facebookClient));
+                    array_push($result, new GraphObject($field, $this->_facebookClient));
                 } else {
-                    array_push($result, new FacebookStruct($field, $this->_facebookClient));
+                    array_push($result, new GraphStruct($field, $this->_facebookClient));
                 }
             }
         } else {
             if (isset($fieldArray['id'])) {
-                $result = new FacebookObject($fieldArray, $this->_facebookClient);
+                $result = new GraphObject($fieldArray, $this->_facebookClient);
             } else {
-                $result = new FacebookStruct($fieldArray, $this->_facebookClient);
+                $result = new GraphStruct($fieldArray, $this->_facebookClient);
             }
         }
         return $result;
@@ -94,7 +94,7 @@ class FacebookStruct {
 
 
     /**
-     * Facebook client associated with the objects
+     * Graph client associated with the objects
      *
      * @var object
      */

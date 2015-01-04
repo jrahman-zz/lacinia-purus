@@ -6,7 +6,7 @@
  * @author Jason P Rahman (jprahman93@gmail.com, rahmanj@purdue.edu)
  *
  */
-class CRU_Defines {
+class Defines {
 
     // Empty private constructor to disallow instantiation
     private function __construct() {}

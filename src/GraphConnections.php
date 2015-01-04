@@ -1,21 +1,21 @@
 <?php
 
 require_once "Defines.php";
-require_once "FacebookClient.php";
-require_once "FacebookConnection.php";
+require_once "GraphClient.php";
+require_once "GraphConnection.php";
 
 /**
  * Represents a connection from a Facebook graph object
  *
  * @author Jason P Rahman (jprahman93@gmail.com, rahmanj@purdue.edu)
  */
-class FacebookConnections {
+class GraphConnections {
 
     /**
      * Construct a set of connections from the given object
      *
      * @param string $objectId the ID of the object whose connections this object represents
-     * @param object $facebookClient the Facebook client these connections will be associated with
+     * @param object $facebookClient the Graph client these connections will be associated with
      */
     public function __construct($objectId, $facebookClient) {
         if (is_array($objectId)) {
@@ -35,7 +35,7 @@ class FacebookConnections {
      * representing the connection from the facebook graph object
      *
      * @param string $name the name of the connection to fetch
-     * @return mixed Returns either an array of FacebookObjects or a string field value
+     * @return mixed Returns either an array of GraphObjects or a string field value
      * @throw NoSuchFieldException, NoSuchConnectionException
      */
     public function __get($name) {
@@ -43,7 +43,7 @@ class FacebookConnections {
             if ($this->_graphConnections[$name] !== FALSE) {
                 return $this->_graphConnections[$name];
             } else {
-                throw new FacebookNoSuchFieldException($name);
+                throw new GraphNoSuchFieldException($name);
             }
         } else {
             // Attempt to load the connection since we haven't already tried
@@ -51,7 +51,7 @@ class FacebookConnections {
             if ($this->_graphConnections[$name] !== FALSE) {
                 return $this->_graphConnections[$name];
             } else {
-                throw new FacebookNoSuchFieldException($name);  
+                throw new GraphNoSuchFieldException($name);  
             }
         }
     }
@@ -83,11 +83,11 @@ class FacebookConnections {
      * Loads the connection with the given name
      *
      * @param string $name the name of the connection to retrieve
-     * @return mixed a FacebookConnection object if it exists, FALSE otherwise
+     * @return mixed a GraphConnection object if it exists, FALSE otherwise
      */
     private function _loadConnection($name) {
         try {
-            $result = new FacebookConnection($this->_objectId, $name, $this->_facebookClient);
+            $result = new GraphConnection($this->_objectId, $name, $this->_facebookClient);
         } catch (Exception $e) {
             // The connection couldn't be created, probably because 
             // it didn't exist or we didn't have access rights

@@ -1,8 +1,8 @@
 <?php
 require_once "Defines.php";
-require_once "FacebookClient.php";
-require_once "FacebookFields.php";
-require_once "FacebookConnections.php";
+require_once "GraphClient.php";
+require_once "GraphFields.php";
+require_once "GraphConnections.php";
 
 
 /**
@@ -11,7 +11,7 @@ require_once "FacebookConnections.php";
  * @author Jason P Rahman (jprahman93@gmail.com, rahmanj@purdue.edu)
  *
  */
-class FacebookObject {
+class GraphObject {
 
 
     /**
@@ -19,7 +19,7 @@ class FacebookObject {
      *
      * @param mixed $objectId the ID of the object to create or an associative array which includes the ID
 	 * @param array $fields a list of fields to fetch for the object
-     * @param object $client the Facebook client object to
+     * @param object $client the Graph client object to
      *                       be used to create the object
      * @throws
      */
@@ -30,7 +30,7 @@ class FacebookObject {
                 $fields = $objectId;
                 $this->_objectId = $objectId['id'];
             } else {
-                throw new FacebookNoSuchFieldException();
+                throw new GraphNoSuchFieldException();
             }
         } else {
             $fields = $client->getObject($objectId, $fields);
@@ -38,8 +38,8 @@ class FacebookObject {
         }
 
         
-        $this->_fields = new FacebookFields($fields, $client);
-        $this->_connections = new FacebookConnections($objectId, $client);
+        $this->_fields = new GraphFields($fields, $client);
+        $this->_connections = new GraphConnections($objectId, $client);
 
         $this->_facebookClient = $client;       
     }
@@ -49,7 +49,7 @@ class FacebookObject {
      * Get a property with the specified name
      *
      * @param string 
-     * @return object a FacebookFields or FacebookConnections object
+     * @return object a GraphFields or GraphConnections object
      * @throws Exception
      */
     public function __get($name) {
@@ -122,7 +122,7 @@ class FacebookObject {
  * @author Jason P Rahman (jprahman93@gmail.com, rahmanj@purdue.edu)
  *
  */
-class FacebookNoSuchFieldException extends Exception {
+class GraphNoSuchFieldException extends Exception {
     
     public function __construct($name) {
         parent::__construct("No field named " . $name . " found");

@@ -1,7 +1,7 @@
 <?php
 
 require_once "Defines.php";
-require_once "FacebookClient.php";
+require_once "GraphClient.php";
 
 /**
  * Represents the fields of a Facebook graph object
@@ -9,13 +9,13 @@ require_once "FacebookClient.php";
  * @author Jason P Rahman (jprahman93@gmail.com, rahmanj@purdue.edu)
  *
  */
-class FacebookFields implements Iterator {
+class GraphFields implements Iterator {
 
     /**
      * Construct an instance of a set of fields
      *
      * @param array $fields an array of associative arrays holding the partial subobject information
-     * @param object $facebookClient the Facebook client associated with these fields
+     * @param object $facebookClient the Graph client associated with these fields
      */
     public function __construct($fields, $facebookClient) {
         // TODO Add validation
@@ -81,8 +81,8 @@ class FacebookFields implements Iterator {
      * representing the fields of the facebook graph object
      *
      * @param string $name the name of the field to fetch
-     * @return mixed Returns either an array of FacebookObjects or a string field value
-     * @throw FacebookNoSuchFieldException
+     * @return mixed Returns either an array of GraphObjects or a string field value
+     * @throw GraphNoSuchFieldException
      */
     public function __get($name) {
         if (isset($this->_expandedObjectFields[$name])) {
@@ -114,7 +114,7 @@ class FacebookFields implements Iterator {
             $this->_hasBeenExpanded = TRUE;
             return $this->__get($name);
         } else {
-            throw new FacebookNoSuchFieldException($name);
+            throw new GraphNoSuchFieldException($name);
         }
     }
 
@@ -140,7 +140,7 @@ class FacebookFields implements Iterator {
      *
      * @param array $fieldArray an array of associative arrays holding partial
      *                          object information for each object in the field
-     * @return array an array containing FacebookObjects for each 
+     * @return array an array containing GraphObjects for each 
      *               object in the field
      */
     private function _expandField($fieldArray) {
@@ -149,16 +149,16 @@ class FacebookFields implements Iterator {
             $result = array();
             foreach ($fieldArray as $field) {
                 if (isset($field['id'])) {
-                    array_push($result, new FacebookObject($field, $this->_facebookClient));
+                    array_push($result, new GraphObject($field, $this->_facebookClient));
                 } else {
-                    array_push($result, new FacebookStruct($field, $this->_facebookClient));
+                    array_push($result, new GraphStruct($field, $this->_facebookClient));
                 }
             }
         } else {
             if (isset($fieldArray['id'])) {
-                $result = new FacebookObject($fieldArray, $this->_facebookClient);
+                $result = new GraphObject($fieldArray, $this->_facebookClient);
             } else {
-                $result = new FacebookStruct($fieldArray, $this->_facebookClient);
+                $result = new GraphStruct($fieldArray, $this->_facebookClient);
             }
         }
         return $result;

@@ -1,20 +1,20 @@
 <?php
 
-require_once "FacebookClient.php";
-require_once "FacebookObject.php";
-require_once "FacebookStruct.php";
+require_once "GraphClient.php";
+require_once "GraphObject.php";
+require_once "GraphStruct.php";
 
 
 /**
-* Represents a connection from a FacebookObject
+* Represents a connection from a GraphObject
 *
 * @author Jason P Rahman (jprahman93@gmail.com, rahmanj@purdue.edu)
 *
 */
-class FacebookConnection implements Iterator, ArrayAccess {
+class GraphConnection implements Iterator, ArrayAccess {
 
     /**
-     * Construct an instance of a Facebook connection
+     * Construct an instance of a Graph connection
      *
      * @param string $objectId the ID of the object this connection leads from
      * @param string $name the name of this particular connection
@@ -138,7 +138,7 @@ class FacebookConnection implements Iterator, ArrayAccess {
      *
      * @param string $connectionName the name of the connection to load
      * @return mixed FALSE if the connection couldn't be found,
-     *                     an array of FacebookObjects otherwise
+     *                     an array of GraphObjects otherwise
      */
     private function _loadConnection($connectionName) {
         // Attempt to fetch the graph connection with the given name
@@ -172,23 +172,23 @@ class FacebookConnection implements Iterator, ArrayAccess {
      *
      * @param array $connectionArray an array of associative arrays holding partial information
      *                               for each object that is part of the connection
-     * @return array an array of CRU_Facebook_Objects representing the connection
+     * @return array an array of GraphObjects representing the connection
      */
     private function _expandConnection($connectionArray) {
         if (is_array($connectionArray) && isset($connectionArray[0]) && is_array($connectionArray[0])) {
             $result = array();
             foreach ($connectionArray as $connection) {
                 if (isset($connection['id'])) {
-                    array_push($result, new FacebookObject($connection, $this->_facebookClient));
+                    array_push($result, new GraphObject($connection, $this->_facebookClient));
                 } else {
-                    array_push($result, new FacebookStruct($connection, $this->_facebookClient));
+                    array_push($result, new GraphStruct($connection, $this->_facebookClient));
                 }
             }
         } else {
             if (isset($connectionArray['id'])) {
-                $result = new FacebookObject($connectionArray, $this->_facebookClient);
+                $result = new GraphObject($connectionArray, $this->_facebookClient);
             } else {
-                $result = new FacebookStruct($connectionArray, $this->_facebookClient);
+                $result = new GraphStruct($connectionArray, $this->_facebookClient);
             }
         }
         return $result;
@@ -196,7 +196,7 @@ class FacebookConnection implements Iterator, ArrayAccess {
 
 
     /**
-     * The FacebookObjects in the connection
+     * The GraphObjects in the connection
      *
      * @var object
      */
@@ -205,7 +205,6 @@ class FacebookConnection implements Iterator, ArrayAccess {
     
     /**
      * The current position of the iterator
-     *
      */
     private $_currentPosition;
 

@@ -12,10 +12,10 @@ require_once Defines::facebookApiDir . "facebook.php";
  * @author Jason P Rahman (jprahman93@gmail.com, rahmanj@purdue.edu)
  *
  */
-class FacebookClient {
+class GraphClient {
 
     /**
-     * Create a new instance of a FacebookClient
+     * Create a new instance of a GraphClient
      *
      * @param string $appId the Facebook application ID
      * @param string $appSecret the Facebook application secret 
@@ -28,7 +28,7 @@ class FacebookClient {
         try {
             $this->_facebookClient = new Facebook($facebookConfig);
         } catch (Exception $e) {
-            throw new FacebookInitializationException($e->getMessage());
+            throw new GraphInitializationException($e->getMessage());
         }
     }
 
@@ -48,7 +48,7 @@ class FacebookClient {
 				$query_string = "";
 			}
             $array = $this->_makeGetRequest($objectId . $query_string);
-        } catch (FacebookApiException $e) {
+        } catch (GraphApiException $e) {
             $this->_throwException($e);
         } catch (Exception $e) {
 
@@ -74,7 +74,7 @@ class FacebookClient {
             if (isset($array['data'])) {
                 $array = $array['data'];
             }
-        } catch (FacebookApiException $e) {
+        } catch (GraphApiException $e) {
             $this->_throwException($e);
         } catch (Exception $e) {
             throw $e;
@@ -101,7 +101,7 @@ class FacebookClient {
      * @param string $id the ID of the object to make the post request to
      * @param 
      * @return array associative array parsed from the JSON response data
-     * @throws FacebookApiException
+     * @throws GraphApiException
      */
     private function _makePostRequest($id, $postContent) {
         // TODO Finish this
@@ -110,7 +110,7 @@ class FacebookClient {
 
 
     /**
-     * Process a FacebookApiException a throw a new exception based on the details
+     * Process a GraphApiException a throw a new exception based on the details
      *
      * @param object $exception
      */
@@ -146,7 +146,7 @@ class FacebookClient {
 
 
     /**
-     * The Facebook API client we are using    
+     * The Graph API client we are using    
      *
      * @var object
      */
@@ -160,7 +160,7 @@ class FacebookClient {
  *
  * @author Jason P Rahman (jprahman93@gmail.com, rahmanj@purdue.edu)
  */
-class Facebook_InitializationException extends Exception {
+class GraphInitializationException extends Exception {
     
     /**
      * Create a new instance of the exception
@@ -177,7 +177,7 @@ class Facebook_InitializationException extends Exception {
  *
  * @author Jason P Rahman (jprahman93@gmail.com, rahmanj@purdue.edu)
  */
-class FacebookNoSuchObjectException extends Exception {
+class GraphNoSuchObjectException extends Exception {
 
 
     /**
@@ -197,7 +197,7 @@ class FacebookNoSuchObjectException extends Exception {
  * @author Jason P Rahman (jprahman93@gmail.com, rahmanj@purdue.edu)
  * 
  */
-class FacebookNoSuchConnectionException extends Exception {
+class GraphNoSuchConnectionException extends Exception {
 
 
     /**
@@ -217,7 +217,7 @@ class FacebookNoSuchConnectionException extends Exception {
  *
  * @author Jason P Rahman (jprahman93@gmail.com. rahmanj@purdue.edu)
  */
-class FacebookOAuthAccessException extends Exception {
+class GraphOAuthAccessException extends Exception {
     
 
     /**
@@ -234,7 +234,7 @@ class FacebookOAuthAccessException extends Exception {
  *
  * @author Jason P Rahman (jprahman93@gmail.com, rahmanj@purdue.edu)
  */
-class FacebookUnknownException extends Exception {
+class GraphUnknownException extends Exception {
 
 
     /**
