@@ -20,15 +20,28 @@ class GraphObject {
 	 * @param array $fields a list of fields to fetch for the object
      * @param object $client the Graph client object to
      *                       be used to create the object
+     * @param object $object Partially materialized object for use, leave empty for full initialization
      * @throws
      */
-    public function __construct($objectId, $client) {
-        // Fetch the results from Facebook and save everything we need
-        $fields = $client->getObject($objectId);
-        $this->_objectId = $objectId;
+    public function __construct($objectId, $client, $object = []) {
 
-        
-        $this->_fields = new GraphFields($fields, $client);
+        // If we were NOT handed a partially materialized object, then fetch the full object
+        if (isempty($object)) {
+            $object = $client->getObject($objectId);
+            $object->_fields = new MaterializedGraphFields($object, $client);
+            $this->_materialized = TRUE;
+        } else {
+            
+            $this->_fields = new PartialGraphFields($object, $client); 
+            $this->_materialized = FALSE;
+            // Sanity check
+            if ($object->id !== $objectId) {
+                throw Exception("Mismatch between given ID and object: " . $objectId . " != " . $object->id);
+            }
+        }
+
+        $this->_objectId = $objectId;
+ 
         $this->_connections = new GraphConnections($objectId, $client);
 
         $this->_facebookClient = $client;       
@@ -39,30 +52,34 @@ class GraphObject {
      * Get a property with the specified name
      *
      * @param string 
-     * @return object a GraphFields or GraphConnections object
+     * @return mixed A object property or GraphConnections object
      * @throws Exception
      */
     public function __get($name) {
         if ($name === "connections") {
             return $this->_connections;
         } else {
-            return $this->_fields->__get($name);
+            if ($this->_materialized) {
+                return $this->_fields->__get($name);
+            } else {
+                try {
+                    return $this->_fields->__get($name);
+                } catch (GraphNoSuchFieldException ex) {
+                    // Materialize and retry
+                    $this->_materialize();
+                    return $this->_fields->__get($name);
+                }
+            }
         }
     }
 
     /**
+     * Check if a given field is set or not
      *
-     *
-     *
-     *
+     * @return bool
      */
     public function __isset($name) {
-        try {
-            $this->__get($name);
-            return TRUE;
-        } catch (Exception $e) {
-            return FALSE;
-        }
+        return $this->_fields->__isset($name) || $name === "connections";
     }
 
 
@@ -75,17 +92,28 @@ class GraphObject {
      * @return mixed
      */
     public function __call($name, $args) {
-        
-        switch ($name) {
-            case "like":
-                // TODO
-                break;
-            case "unlike":
-                // TODO
-                break;
-        }
+        // TODO Finish this
+        $this->_facebookClient->callAction($name, $this->_objectId, $args);
+
     }
 
+
+    /**
+     * Materialze a given object, previously based off of partial information
+     *
+     *
+     */
+    private function _materialze() {
+        // TODO
+        $this->_materialized = TRUE;
+    }
+
+    /**
+     * Indicates if this object has been fully materialized or is only partially built
+     *
+     * @var bool
+     */
+    private $_materialized;
 
     /**
      * Facebook graph objectId for the current object

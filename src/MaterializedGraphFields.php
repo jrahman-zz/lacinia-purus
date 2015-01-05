@@ -4,27 +4,31 @@ require_once "Defines.php";
 require_once "GraphClient.php";
 
 /**
- * Represents the fields of a Facebook graph object
+ * Represents the fully materialized fields of a Facebook graph object
  *
  * @author Jason P Rahman (jprahman93@gmail.com, rahmanj@purdue.edu)
  *
  */
-class GraphFields implements Iterator {
+class MaterializedGraphFields implements Iterator {
 
     /**
      * Construct an instance of a set of fields
      *
-     * @param array $fields an array of associative arrays holding the partial subobject information
+     * @param object $object A Facebook GraphObject instance
      * @param object $facebookClient the Graph client associated with these fields
      */
     public function __construct($object, $facebookClient) {
-        $this->_hasBeenExpanded = FALSE;
-        $this->_object = $object;
+
+        // Convert back to associative array format for ease of handling
+        $this->_values = $object;
+
+        // Extract a list of property names for later use
         $this->_propertyNames = array();
-        for ($object->getPropertyNames as $name) {
+        for ($object->getPropertyNames() as $name) {
             $this->_propertyNames[$name] = 1;
         }
         $this->_keys = array_keys($this->_propertyNames);
+
         $this->_facebookClient = $facebookClient;
     }
 
@@ -87,9 +91,25 @@ class GraphFields implements Iterator {
      * @throw GraphNoSuchFieldException
      */
     public function __get($name) {
-        if () {
-            // TODO, wrap GraphObject return values
-            return $this->_object->getProperty($name);
+        if (array_key_exists($name, $this->_propertyNames) && $this->_propertyNames[$name]) {
+            $value = $this->_values->getProperty($name);
+            if (isobject($value)) {
+                
+                // We need to check two cases, in the first the embedded object has an ID
+                // thus we should wrap it inside a GraphObject so that the GraphObject
+                // can automatically handle materializing the object as needed
+                // In the second case without an ID, we wrap inside a GraphStruct
+                // which will handle complex subfields and embedded arrays
+                
+                // TODO, update now that $value is a GraphObject from the API
+                if (isset($value->id)) {
+                    return new GraphObject($value->getProperty("id"), $this->_facebookClient, $value);
+                } else {
+                    return new GraphStruct($value, $this->_facebookClient);
+                }
+            } else {
+                return $value;
+            }
         } else {
             throw new GraphNoSuchFieldException($name);
         }
@@ -103,8 +123,7 @@ class GraphFields implements Iterator {
      * @return bool TRUE if the field does exist, FALSE otherwise
      */
     public function __isset($name) {
-        if (array_key_exists($name, $this->_propertyNames)
-            && $this->_propertyNames[$name] > 0) {
+        if (array_key_exists($name, $this->_propertyNames) && $this->_propertyNames[$name]) {
             return TRUE;
         } else {
             return FALSE;

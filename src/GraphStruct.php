@@ -14,7 +14,6 @@ class GraphStruct {
     public function __construct($fields, $client) {
         $this->_facebookClient = $client;
         $this->_objectFields = $fields;
-
     }
 
 
@@ -64,7 +63,7 @@ class GraphStruct {
 
 
     /**
-     * Take a array of associative arrays representing a field and expand them into objects
+     * Take an array of associative arrays representing a field and expand them into objects
      *
      * @param array $fieldArray an array of associative arrays holding partial
      *                          object information for each object in the field
